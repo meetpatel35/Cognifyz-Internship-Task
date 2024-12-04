@@ -1,0 +1,44 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+        <form action="/submit-expense" method="POST">
+            <div class="form-group">
+                <label for="expenseName">Expense Name</label>
+                <input type="text" id="expenseName" name="expenseName" required>
+            </div>
+            <div class="form-group">
+                <label for="expenseType">Expense Type</label>
+                <select id="expenseType" name="expenseType" required>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="expenseAmount">Amount</label>
+                <input type="number" id="expenseAmount" name="expenseAmount" required>
+            </div>
+            <div class="form-group">
+                <label for="expenseDate">Expense Date</label>
+                <input type="date" id="expenseDate" name="expenseDate" value="<%= currentDate %>" required>
+            </div>
+            <div class="form-group">
+                <label for="expenseTime">Expense Time</label>
+                <input type="time" id="expenseTime" name="expenseTime" value="<%= currentTime %>" required>
+            </div>
+            <button type="submit">Submit Expense</button>
+        </form>
+    </div>
+</body>
+</html>
