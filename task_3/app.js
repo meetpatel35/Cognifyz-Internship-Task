@@ -1,46 +1,54 @@
 const express = require('express');
-const app = express();
 const path = require('path');
+const app = express();
 
+let expenses = []; // Temporary server-side storage
+
+// Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static(path.join(__dirname, 'public')));
+// Set EJS as the templating engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-let expenses = [];
-
+// Routes
 app.get('/', (req, res) => {
-    const currentDate = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
-    const istDate = new Date(currentDate.getTime() + istOffset);
+    res.render('home');
+});
 
-    const currentDateString = istDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-    const currentTimeString = istDate.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS format
-    
-    res.render('index', { currentDate: currentDateString, currentTime: currentTimeString });
+app.get('/about', (req, res) => {
+    res.render('about');
 });
 
 app.post('/submit-expense', (req, res) => {
     const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
 
     // Server-side validation
-    if (!expenseName || !expenseAmount || expenseAmount <= 0) {
-        return res.status(400).send('Invalid data! Ensure all fields are filled correctly.');
+    if (!expenseName || expenseName.length < 3) {
+        return res.status(400).send('Expense name must be at least 3 characters long.');
+    }
+    if (!expenseType) {
+        return res.status(400).send('Expense type is required.');
+    }
+    if (expenseAmount <= 0) {
+        return res.status(400).send('Expense amount must be greater than 0.');
     }
 
-    const newExpense = {
+    // Add the validated data to the server-side storage
+    expenses.push({
         expenseName,
         expenseType,
-        expenseAmount,
+        expenseAmount: parseFloat(expenseAmount),
         expenseDate,
         expenseTime,
-    };
+    });
 
-    expenses.push(newExpense);
-    console.log(expenses)
+    console.log(expenses); // Debugging: Print stored expenses
     res.send('Expense submitted successfully!');
 });
 
-app.listen(5000, () => {
-    console.log('Server is running on http://localhost:5000');
+// Start the server
+const PORT = 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
 });
