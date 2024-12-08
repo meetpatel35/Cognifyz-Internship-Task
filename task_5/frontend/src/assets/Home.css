@@ -1,0 +1,40 @@
+.Home-main {
+    background-image: url("https://img.freepik.com/free-vector/blank-blue-halftone-background_53876-114592.jpg?semt=ais_hybrid");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  
+  .nav-head {
+    color: blue;
+    font-size: 22px;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    font-weight: bold;
+  }
+  
+  .nav-element {
+    font-size: 18px;
+  }
+  
+  .nav-element:hover {
+    font-weight: 500;
+  }
+  
+  .keyframe-cont {
+    width: 50%;
+  }
+  
+  @media (max-width: 1000px) {
+    .keyframe-cont {
+      width: 75%;
+    }
+  }
+  
+  .cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #expenseForm{
+    margin: auto;
+  }

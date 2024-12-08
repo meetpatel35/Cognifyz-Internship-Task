@@ -1,0 +1,37 @@
+.About-main {
+    background-image: url("https://media.istockphoto.com/id/1318682496/photo/top-view-photo-of-aircraft-model-on-calculator-cup-flowerpot-organizer-pen-glasses-on.jpg?s=612x612&w=0&k=20&c=qVk4T9HUf8DDbwLJ3nnvWQhU5sy6DG6k31shSASM8WI=");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+  }
+  
+  .nav-head {
+    color: blue;
+    font-size: 22px;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    font-weight: bold;
+  }
+  
+  .nav-element {
+    font-size: 18px;
+  }
+  
+  .nav-element:hover {
+    font-weight: 500;
+  }
+  
+  .about {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    max-width: 69%;
+    margin: 50px auto;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact-info span {
+    font-weight: bold;
+    color: #343a40;
+  }
+  
