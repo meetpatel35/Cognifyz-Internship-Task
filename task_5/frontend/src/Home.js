@@ -142,6 +142,7 @@ const Home = () => {
     }
   };
 
+  const currentDate = new Date();
   const getISTTime = () => {
     const currentDate = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
@@ -232,8 +233,11 @@ const Home = () => {
             >
               <option value="Food">Food</option>
               <option value="Transport">Transport</option>
+              <option value="Academics">Transport</option>
               <option value="Entertainment">Entertainment</option>
+              <option value="Personal Expenses">Entertainment</option>
               <option value="Utilities">Utilities</option>
+              <option value="Bills">Utilities</option>
               <option value="Others">Others</option>
             </select>
           </div>
@@ -259,6 +263,7 @@ const Home = () => {
               id="expenseDate"
               name="expenseDate"
               className="form-control"
+              defaultValue={currentDate.toISOString().split("T")[0]}
               required
             />
           </div>
