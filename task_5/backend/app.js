@@ -73,10 +73,10 @@ app.post('/expenses', async(req, res) => {
 });
 
 app.get('/expenses', async (req, res) => {
-    const email = req.query.email; // Extract email from query
+    const email = req.query.email; 
     try {
-        const { expensesdb } = await connectToDatabase(); // Connect to DB
-        const expenses = await expensesdb.find({ email }).toArray(); // Fetch expenses
+        const { expensesdb } = await connectToDatabase(); 
+        const expenses = await expensesdb.find({ email }).toArray(); 
         res.status(200).json({ message: 'Expenses fetched successfully!', expenses });
     } catch (error) {
         console.error('Error fetching expenses:', error);
