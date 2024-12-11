@@ -32,7 +32,7 @@ const Home = () => {
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
-  }, []); // Only run this effect once when the component mounts
+  }, []);
 
   useEffect(() => {
     const options = {

@@ -2,12 +2,10 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-let expenses = []; // Temporary server-side storage
+let expenses = [];
 
-// Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 
-// Set EJS as the templating engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -34,7 +32,6 @@ app.post('/submit-expense', (req, res) => {
         return res.status(400).send('Expense amount must be greater than 0.');
     }
 
-    // Add the validated data to the server-side storage
     expenses.push({
         expenseName,
         expenseType,
@@ -43,12 +40,11 @@ app.post('/submit-expense', (req, res) => {
         expenseTime,
     });
 
-    console.log(expenses); // Debugging: Print stored expenses
+    console.log(expenses);
     res.send('Expense submitted successfully!');
 });
 
 
-// Start the server
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);

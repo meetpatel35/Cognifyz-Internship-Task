@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken"); // Import JWT
 const app = express();
 const connectToDatabase = require("./db");
 
-const JWT_SECRET = "6969abcd"; // Use environment variables in production
+const JWT_SECRET = "jwtsecret"; // Use environment variables in production
 let users = [];
 
 app.use(cors());

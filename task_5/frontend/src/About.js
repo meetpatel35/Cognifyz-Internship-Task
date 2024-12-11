@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./assets/About.css"; // Move your styles to a separate CSS file.
+import "./assets/About.css"; 
 
 const About = () => {
   return (

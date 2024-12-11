@@ -20,7 +20,6 @@ app.get('/about', (req, res) => {
 app.post('/submit-expense', (req, res) => {
     const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
 
-    // Server-side validation
     if (!expenseName || expenseName.length < 3) {
         return res.status(400).send('Expense name must be at least 3 characters long.');
     }
@@ -43,7 +42,6 @@ app.post('/submit-expense', (req, res) => {
     res.send('Expense submitted successfully!');
 });
 
-// Start the server
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
