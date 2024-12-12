@@ -152,7 +152,7 @@ app.put("/expenses/:id", authenticateToken, async (req, res) => {
 
   try {
     const result = await expensesdb.updateOne(
-      { _id: new ObjectId(id) }, // Ensure the ID is correctly converted to ObjectId
+      { _id: new ObjectId(id) },
       {
         $set: {
           expenseName,

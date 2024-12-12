@@ -7,7 +7,6 @@ async function connectToDatabase() {
     try {
         await client.connect();
         // console.log('Connected to MongoDB!');
-
         const db = client.db('expensetracker'); 
         const expensesdb = db.collection('expenses');
         const users = db.collection('users');
