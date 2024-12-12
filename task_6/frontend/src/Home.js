@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./assets/Home.css";
 import Typed from "typed.js";
 import ExpenseCard from "./ExpenseCard";
-import { jwtDecode } from "jwt-decode"; // Corrected the import statement
+import { jwtDecode } from "jwt-decode";
 
 const Home = () => {
   const [result, setResult] = useState({ expenses: [] });
   const [isLoading, setIsLoading] = useState(false);
-  const [userEmail, setUserEmail] = useState(""); // Store user email from token
+  const [userEmail, setUserEmail] = useState("");
+  const [editExpense, setEditExpense] = useState({
+    id:"",
+    email:"",
+    expenseName: "",
+    expenseType: "",
+    expenseAmount: "",
+    expenseDate: "",
+    expenseTime: ""
+  })
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,15 +26,15 @@ const Home = () => {
       alert("Unauthorized! Please log in.");
       window.location.href = "/login";
       return;
-    }else{
+    } else {
 
-      console.log("Token:", token);
+      // console.log("Token:", token);
     }
 
     try {
-      const decoded = jwtDecode(token); // Corrected function call to jwtDecode
-      setUserEmail(decoded.email); // Extract and set user email
-      fetchExpenses(decoded.email); // Fetch expenses for the logged-in user
+      const decoded = jwtDecode(token);
+      setUserEmail(decoded.email);
+      fetchExpenses(decoded.email);
     } catch (error) {
       console.error("Invalid token:", error);
       alert("Session expired. Please log in again.");
@@ -131,7 +140,7 @@ const Home = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include token
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           email: userEmail,
@@ -142,7 +151,7 @@ const Home = () => {
           expenseTime,
         }),
       });
-      
+
 
       const newResult = await response.json();
       if (response.ok) {
@@ -159,13 +168,76 @@ const Home = () => {
     }
   };
 
+  const ref = useRef(null)
+  const updateExpense = (expense) => {
+    console.log(expense)
+    setEditExpense({id:expense._id, email:expense.email, expenseName: expense.expenseName, expenseType: expense.expenseType, expenseAmount: expense.expenseAmount, expenseDate: expense.expenseDate, expenseTime: expense.expenseTime })
+    console.log(editExpense)
+  }
+
+  const openModal = () => {
+    ref.current.click();
+  }
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setEditExpense({ ...editExpense, [name]: value });
+  };
+
+  const refClose = useRef(null)
+  const handleEditExpense = async (event) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Unauthorized. Please log in.");
+      window.location.href = "/login";
+      return;
+    }
+    event.preventDefault();
+  
+    try {
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:5000/expenses/${editExpense.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: editExpense.email,
+          expenseName: editExpense.expenseName,
+          expenseType: editExpense.expenseType,
+          expenseAmount: editExpense.expenseAmount,
+          expenseDate: editExpense.expenseDate,
+          expenseTime: editExpense.expenseTime,
+        }),
+      });
+  
+      const newResult = await response.json();
+      if (response.ok) {
+        setResult({ expenses: newResult.expenses });
+        alert("Expense updated successfully!");
+      } else {
+        alert(`Failed to update expense: ${newResult.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while updating the expense.");
+    } finally {
+      setIsLoading(false);
+    }
+  
+    refClose.current.click();
+  };
+  
+
+
   const currentDate = new Date();
   const getISTTime = () => {
-    const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+    const istOffset = 5.5 * 60 * 60 * 1000;
     const istDate = new Date(currentDate.getTime() + istOffset);
     const hours = istDate.getUTCHours().toString().padStart(2, "0");
     const minutes = istDate.getUTCMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`; // Return time in "HH:mm" format
+    return `${hours}:${minutes}`;
   };
 
   const defaultISTTime = getISTTime();
@@ -308,11 +380,116 @@ const Home = () => {
               key={expense._id}
               expense={expense}
               onDelete={handleDeleteExpense}
+              updateExpense={updateExpense}
+              openModal={openModal}
             />
           ))
         ) : (
           <p className="text-center">No expenses found. Add one now!</p>
         )}
+      </div>
+
+      <button type="button" ref={ref} className="d-none btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Launch demo modal
+      </button>
+
+      <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Edit Note</h5>
+            </div>
+
+            <div className="modal-body">
+              <form id="expenseForm" className="card p-4 shadow">
+                <div className="mb-3">
+                  <label htmlFor="expenseName" className="form-label">
+                    Expense Name
+                  </label>
+                  <input
+                    type="text"
+                    id="expenseName"
+                    name="expenseName"
+                    className="form-control"
+                    value={editExpense.expenseName}
+                    onChange={onChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="expenseType" className="form-label">
+                    Expense Type
+                  </label>
+                  <select
+                    id="expenseType"
+                    name="expenseType"
+                    className="form-select"
+                    value={editExpense.expenseType}
+                    onChange={onChange}
+                    required
+                  >
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Academics">Academics</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Personal Expenses">Personal Expenses</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Others">Others</option>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="expenseAmount" className="form-label">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    id="expenseAmount"
+                    name="expenseAmount"
+                    className="form-control"
+                    value={editExpense.expenseAmount}
+                    onChange={onChange}
+                    required
+                    min="1"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="expenseDate" className="form-label">
+                    Expense Date
+                  </label>
+                  <input
+                    type="date"
+                    id="expenseDate"
+                    name="expenseDate"
+                    className="form-control"
+                    value={editExpense.expenseDate}
+                    onChange={onChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="expenseTime" className="form-label">
+                    Expense Time
+                  </label>
+                  <input
+                    type="time"
+                    id="expenseTime"
+                    name="expenseTime"
+                    className="form-control"
+                    value={editExpense.expenseTime}
+                    onChange={onChange}
+                    required
+                  />
+                </div>
+              </form>
+
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" ref={refClose}>Close</button>
+              <button type="button" className="btn btn-primary" onClick={handleEditExpense}>Save changes</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

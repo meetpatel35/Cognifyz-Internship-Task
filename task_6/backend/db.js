@@ -6,7 +6,7 @@ const client = new MongoClient(uri);
 async function connectToDatabase() {
     try {
         await client.connect();
-        console.log('Connected to MongoDB!');
+        // console.log('Connected to MongoDB!');
 
         const db = client.db('expensetracker'); 
         const expensesdb = db.collection('expenses');

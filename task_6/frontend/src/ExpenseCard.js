@@ -1,6 +1,6 @@
 import React from "react";
 
-const ExpenseCard = ({ expense, onDelete }) => {
+const ExpenseCard = ({ expense, onDelete ,updateExpense,openModal}) => {
   return (
     <div className="card" style={{ width: "18rem", margin: "20px" }}>
       <div className="card-body">
@@ -9,13 +9,8 @@ const ExpenseCard = ({ expense, onDelete }) => {
         <p className="card-text mb-1">Amount: {expense.expenseAmount}</p>
         <p className="card-text mb-1">Time: {expense.expenseTime}</p>
         <p className="card-text mb-1">Date: {expense.expenseDate}</p>
-        <button className="btn btn-secondary">Edit</button>
-        <button
-          className="btn btn-danger mx-2"
-          onClick={() => onDelete(expense._id)}
-        >
-          Delete
-        </button>
+        <button className="btn btn-secondary" onClick={()=> {updateExpense(expense); openModal()}}>Edit</button>
+        <button className="btn btn-danger mx-2" onClick={() => onDelete(expense._id)} >Delete </button>
       </div>
     </div>
   );

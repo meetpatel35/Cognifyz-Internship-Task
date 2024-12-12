@@ -15,8 +15,8 @@ app.get("/", (req, res) => {
   res.send("API is working!");
 });
 app.get("/protected", verifyToken, (req, res) => {
-    res.status(200).json({ message: "Access granted to protected route", user: req.user });
-  });
+  res.status(200).json({ message: "Access granted to protected route", user: req.user });
+});
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -81,7 +81,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/expenses",authenticateToken, async (req, res) => {
+app.post("/expenses", authenticateToken, async (req, res) => {
   const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
 
   if (!expenseName || expenseName.length < 3) {
@@ -113,7 +113,7 @@ app.post("/expenses",authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/expenses",authenticateToken, async (req, res) => {
+app.get("/expenses", authenticateToken, async (req, res) => {
   try {
     const { expensesdb } = await connectToDatabase();
     const expenses = await expensesdb.find({ email: req.user.email }).toArray();
@@ -139,6 +139,43 @@ app.delete("/expenses/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Failed to delete expense" });
   }
 });
+
+
+app.put("/expenses/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
+
+  const { expensesdb ,ObjectId} = await connectToDatabase();
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid expense ID." });
+  }
+
+  try {
+    const result = await expensesdb.updateOne(
+      { _id: new ObjectId(id) }, // Ensure the ID is correctly converted to ObjectId
+      {
+        $set: {
+          expenseName,
+          expenseType,
+          expenseAmount,
+          expenseDate,
+          expenseTime,
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Expense not found." });
+    }
+
+    const expenses = await expensesdb.find({ email: req.user.email }).toArray();
+    res.status(201).json({ message: "Expense Edited successfully!", expenses });
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
 
 const PORT = 5000;
 app.listen(PORT, () => {
