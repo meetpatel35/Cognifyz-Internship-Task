@@ -1,12 +1,11 @@
 const verifyToken = require("./verifyToken");
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken"); // Import JWT
+const jwt = require("jsonwebtoken");
 const app = express();
 const connectToDatabase = require("./db");
 
-const JWT_SECRET = "jwtsecret"; // Use environment variables in production
-let users = [];
+const JWT_SECRET = "jwtsecret"; //Use ENV for better approach
 
 app.use(cors());
 app.use(express.json());
@@ -14,21 +13,6 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("API is working!");
 });
-app.get("/protected", verifyToken, (req, res) => {
-  res.status(200).json({ message: "Access granted to protected route", user: req.user });
-});
-// Middleware to verify JWT token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Token required" });
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "Invalid token" });
-    req.user = user; // Attach user info to request
-    next();
-  });
-};
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
@@ -81,7 +65,18 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/expenses", authenticateToken, async (req, res) => {
+app.get("/expenses", verifyToken, async (req, res) => {
+  try {
+    const { expensesdb } = await connectToDatabase();
+    const expenses = await expensesdb.find({ email: req.user.email }).toArray();
+    res.status(200).json({ message: "Expenses fetched successfully!", expenses });
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.post("/expenses", verifyToken, async (req, res) => {
   const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
 
   if (!expenseName || expenseName.length < 3) {
@@ -113,18 +108,7 @@ app.post("/expenses", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/expenses", authenticateToken, async (req, res) => {
-  try {
-    const { expensesdb } = await connectToDatabase();
-    const expenses = await expensesdb.find({ email: req.user.email }).toArray();
-    res.status(200).json({ message: "Expenses fetched successfully!", expenses });
-  } catch (error) {
-    console.error("Error fetching expenses:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-app.delete("/expenses/:id", authenticateToken, async (req, res) => {
+app.delete("/expenses/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   try {
     const { expensesdb, ObjectId } = await connectToDatabase();
@@ -141,11 +125,11 @@ app.delete("/expenses/:id", authenticateToken, async (req, res) => {
 });
 
 
-app.put("/expenses/:id", authenticateToken, async (req, res) => {
+app.put("/expenses/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { expenseName, expenseType, expenseAmount, expenseDate, expenseTime } = req.body;
+  const { expensesdb, ObjectId } = await connectToDatabase();
 
-  const { expensesdb ,ObjectId} = await connectToDatabase();
   if (!ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid expense ID." });
   }
@@ -170,6 +154,7 @@ app.put("/expenses/:id", authenticateToken, async (req, res) => {
 
     const expenses = await expensesdb.find({ email: req.user.email }).toArray();
     res.status(201).json({ message: "Expense Edited successfully!", expenses });
+
   } catch (error) {
     console.error("Error updating expense:", error);
     res.status(500).json({ message: "Internal server error." });

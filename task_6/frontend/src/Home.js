@@ -6,12 +6,14 @@ import ExpenseCard from "./ExpenseCard";
 import { jwtDecode } from "jwt-decode";
 
 const Home = () => {
+
+  //Props
   const [result, setResult] = useState({ expenses: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [editExpense, setEditExpense] = useState({
-    id:"",
-    email:"",
+    id: "",
+    email: "",
     expenseName: "",
     expenseType: "",
     expenseAmount: "",
@@ -19,15 +21,14 @@ const Home = () => {
     expenseTime: ""
   })
 
+  //Verify that token is present
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       alert("Unauthorized! Please log in.");
       window.location.href = "/login";
       return;
     } else {
-
       // console.log("Token:", token);
     }
 
@@ -43,6 +44,7 @@ const Home = () => {
     }
   }, []);
 
+  //typed strings 
   useEffect(() => {
     const options = {
       strings: [
@@ -59,6 +61,7 @@ const Home = () => {
     };
   }, []);
 
+  //Delete Expense
   const handleDeleteExpense = async (expenseId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
     if (!confirmDelete) return;
@@ -87,6 +90,7 @@ const Home = () => {
     }
   };
 
+  //Fetch all expenses of user
   const fetchExpenses = async (email) => {
     try {
       const response = await fetch(`http://localhost:5000/expenses?email=${email}`, {
@@ -110,6 +114,7 @@ const Home = () => {
     }
   };
 
+  //Add Expense
   const handleFormSubmit = async (event) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -168,10 +173,11 @@ const Home = () => {
     }
   };
 
+  //Edit Expense 
   const ref = useRef(null)
   const updateExpense = (expense) => {
     console.log(expense)
-    setEditExpense({id:expense._id, email:expense.email, expenseName: expense.expenseName, expenseType: expense.expenseType, expenseAmount: expense.expenseAmount, expenseDate: expense.expenseDate, expenseTime: expense.expenseTime })
+    setEditExpense({ id: expense._id, email: expense.email, expenseName: expense.expenseName, expenseType: expense.expenseType, expenseAmount: expense.expenseAmount, expenseDate: expense.expenseDate, expenseTime: expense.expenseTime })
     console.log(editExpense)
   }
 
@@ -185,6 +191,7 @@ const Home = () => {
   };
 
   const refClose = useRef(null)
+
   const handleEditExpense = async (event) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -193,7 +200,7 @@ const Home = () => {
       return;
     }
     event.preventDefault();
-  
+
     try {
       setIsLoading(true);
       const response = await fetch(`http://localhost:5000/expenses/${editExpense.id}`, {
@@ -211,7 +218,7 @@ const Home = () => {
           expenseTime: editExpense.expenseTime,
         }),
       });
-  
+
       const newResult = await response.json();
       if (response.ok) {
         setResult({ expenses: newResult.expenses });
@@ -225,12 +232,11 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  
+
     refClose.current.click();
   };
-  
 
-
+  // Date and time 
   const currentDate = new Date();
   const getISTTime = () => {
     const istOffset = 5.5 * 60 * 60 * 1000;
@@ -239,9 +245,9 @@ const Home = () => {
     const minutes = istDate.getUTCMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   };
-
   const defaultISTTime = getISTTime();
 
+  //HTML Code
   return (
     <div className="Home-main">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
