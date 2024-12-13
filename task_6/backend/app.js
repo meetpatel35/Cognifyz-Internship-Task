@@ -1,4 +1,4 @@
-const verifyToken = require("./verifyToken");
+const verifyToken = require("./middleware/verifyToken");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
